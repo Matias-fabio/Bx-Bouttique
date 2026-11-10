@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Paleta oficial "Calma urbana" */
+  --color-cream: #fdfaf4;
+  --color-peach: #fbe9df;
+  --color-sand: #d2b9ab;
+  --color-terracotta: #bb7869;
+  --color-terracotta-deep: #9a5a4c;
+  --color-terracotta-hover: #7f4a3e;
+  --color-ink: #2b2523;
+  --color-olive: #6f7d52;
+  --color-error: #b3261e;
+
+  /* Radios de curvatura */
+  --radius-img: 18px;
+  --radius-card: 28px;
+  --radius-pill: 9999px;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  min-height: 100vh;
+}

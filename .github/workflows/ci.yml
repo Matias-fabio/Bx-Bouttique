@@ -1,0 +1,44 @@
+name: CI - Integración Continua
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    name: Verificación (Typecheck, Lint, Tests, Build)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Verificación estricta de tipos (tsc)
+        run: pnpm typecheck
+
+      - name: Análisis estático de código (ESLint)
+        run: pnpm lint
+
+      - name: Pruebas unitarias (Vitest)
+        run: pnpm test
+
+      - name: Compilación de producción (Next.js Build)
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/bx_boutique
