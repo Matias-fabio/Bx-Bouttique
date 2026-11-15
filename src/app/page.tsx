@@ -1,33 +1,93 @@
-import { ShoppingBag } from 'lucide-react';
+import React from 'react';
+import { getCatalog } from '@/modules/catalog/contracts';
+import { ProductCard } from '@/ui/components/ProductCard';
+import { Chip } from '@/ui/components/Chip';
+import { Sparkles } from 'lucide-react';
 
-export default function HomePage() {
+interface HomePageProps {
+  searchParams?: Promise<{ categoria?: string }>;
+}
+
+export default async function HomePage(props: HomePageProps) {
+  const searchParams = props.searchParams ? await props.searchParams : {};
+  const selectedCategory = searchParams.categoria;
+
+  // Invocar caso de uso del catálogo
+  const catalog = await getCatalog(selectedCategory);
+
   return (
-    <section className="flex flex-col items-center justify-center py-12 text-center">
-      {/* Tarjeta contenedor Durazno con radio de 28px */}
-      <div className="bg-peach rounded-card p-8 sm:p-12 max-w-2xl w-full border border-sand/30 shadow-sm">
-        <span className="inline-block bg-olive/15 text-olive text-xs font-semibold px-3 py-1 rounded-pill mb-4">
-          Identidad: Calma urbana
-        </span>
-
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-ink mb-4">BX Boutique</h1>
-
-        <p className="text-ink/80 text-base sm:text-lg mb-8 max-w-lg mx-auto">
-          Andamiaje técnico y sistema de diseño base inicializados con éxito.
-        </p>
-
-        {/* Botón primario Terracota Profundo con radio pastilla */}
-        <div className="flex justify-center">
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 bg-terracotta-deep hover:bg-terracotta-
-                        hover text-white font-semibold text-sm h-11 px-6 rounded-pill transition-all active:scale-[0.98]
-                        focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2"
-          >
-            <ShoppingBag className="w-4 h-4" />
-            <span>Próximamente: Catálogo (Corte 1)</span>
-          </button>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8 sm:space-y-12">
+      {/* 1. Hero / Banner Editorial "Calma Urbana" */}
+      <section className="bg-peach/70 rounded-card p-6 sm:p-10 md:p-14 border border-sand/40 relative overflow-hidden">
+        <div className="max-w-2xl space-y-3 sm:space-y-4">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-cream text-terracotta-deep text-xs font-semibold uppercase tracking-wider shadow-xs">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Nueva Colección 2026</span>
+          </div>
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-ink tracking-tight leading-tight">
+            Indumentaria con calma urbana.
+          </h1>
+          <p className="text-sm sm:text-base text-ink/80 leading-relaxed">
+            Prendas básicas y deportivas diseñadas para acompañarte todos los días. Confort genuino, tejidos nobles y siluetas contemporáneas.
+          </p>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* 2. Barra de Categorías / Filtros */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base sm:text-lg font-bold text-ink tracking-tight">
+            Explorá por categoría
+          </h2>
+          <span className="text-xs text-ink/60 font-medium">
+            {catalog.items.length} {catalog.items.length === 1 ? 'prenda' : 'prendas'}
+          </span>
+        </div>
+
+        {/* Chips de filtro con scroll horizontal suave en celulares */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+          <Chip
+            label="Todos los productos"
+            href="/"
+            isActive={!selectedCategory}
+            count={!selectedCategory ? catalog.items.length : undefined}
+          />
+          {catalog.categories.map((cat) => {
+            const isCatActive = selectedCategory?.toLowerCase() === cat.slug.toLowerCase();
+            return (
+              <Chip
+                key={cat.id}
+                label={cat.name}
+                href={`/?categoria=${cat.slug}`}
+                isActive={isCatActive}
+              />
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 3. Grilla de Productos */}
+      <section>
+        {catalog.items.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-6">
+            {catalog.items.map((item) => (
+              <ProductCard key={item.id} product={item} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16 bg-peach/30 rounded-card border border-sand/30 p-8 space-y-3">
+            <p className="text-base font-semibold text-ink">
+              No encontramos prendas en esta categoría por el momento.
+            </p>
+            <p className="text-xs sm:text-sm text-ink/60">
+              Podés explorar todas las prendas disponibles en nuestra tienda.
+            </p>
+            <div className="pt-2">
+              <Chip label="Ver todo el catálogo" href="/" isActive={true} />
+            </div>
+          </div>
+        )}
+      </section>
+    </div>
   );
 }

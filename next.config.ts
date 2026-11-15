@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '*.supabase.co', // Imágenes subidas al bucket de Supabase
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com', // Imágenes de catálogo de prueba
+      },
     ],
   },
 };
